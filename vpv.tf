@@ -37,7 +37,7 @@ resource "databricks_job" "create_acxiom_views" {
 
 job_cluster {
 
-    job_cluster_key ="j_cluster"
+    job_cluster_key ="p_cluster"
 
     new_cluster {
 
