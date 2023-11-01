@@ -14,11 +14,19 @@ provider "aws" {}
 
 provider "databricks" {
   host  = "https://dbc-a08a98d4-658e.cloud.databricks.com/.cloud.databricks.com"
+<<<<<<< HEAD
   token = "dapie8ebcd3fe10b28cc825ae00b54c1f625"
  
 }
 
 resource "databricks_job" "create_acxiom_views" {
+=======
+  token = "dapie73b2f894b4867fef3713a4647b9bf20"
+ 
+}
+
+resource "databricks_job" "create_multiple_task" {
+>>>>>>> master
   name       = "create_acxiom_views"
   
 
@@ -37,7 +45,11 @@ resource "databricks_job" "create_acxiom_views" {
 
 job_cluster {
 
+<<<<<<< HEAD
     job_cluster_key ="p_cluster"
+=======
+    job_cluster_key ="j_cluster"
+>>>>>>> master
 
     new_cluster {
 
@@ -73,13 +85,36 @@ job_cluster {
 
 
 task {
+<<<<<<< HEAD
     task_key = "test_terra_task_version2"
     run_if = "ALL_SUCCESS"
     job_cluster_key ="p_cluster"
+=======
+    task_key = "test_terra_task"
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="j_cluster"
+>>>>>>> master
 
     notebook_task {
       notebook_path = "/Shared/poc_terra"
     
     }
   } 
+<<<<<<< HEAD
 }
+=======
+  
+  task {
+    task_key = "test_terra_task_2"
+     depends_on {
+      task_key = "test_terra_task"
+    }
+
+    job_cluster_key = "j_cluster"
+
+    notebook_task {
+       notebook_path = "/Shared/poc_terra"
+    }
+  } 
+}  
+>>>>>>> master
