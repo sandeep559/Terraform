@@ -18,7 +18,7 @@ provider "databricks" {
  
 }
 
-resource "databricks_job" "create_acxiom_views" {
+resource "databricks_job" "create_multiple_task" {
   name       = "create_acxiom_views"
   
 
