@@ -34,7 +34,7 @@ resource "databricks_job" "create_multiple_task" {
 >>>>>>> master
   name       = "create_acxiom_views"
 =======
-  name       = "terraform_jobb"
+  name       = "terraform_jobbbbbb"
 >>>>>>> master
   
 
