@@ -19,7 +19,7 @@ provider "databricks" {
 }
 
 resource "databricks_job" "create_multiple_task" {
-  name       = "create_acxiom_views"
+  name       = "terraform_job"
   
 
   email_notifications {
