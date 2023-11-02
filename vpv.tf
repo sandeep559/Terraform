@@ -15,15 +15,11 @@ provider "aws" {}
 provider "databricks" {
   host  = "https://dbc-a08a98d4-658e.cloud.databricks.com/.cloud.databricks.com"
 
-  token = "dapie8ebcd3fe10b28cc825ae00b54c1f625"
+  token = "dapie73b2f894b4867fef3713a4647b9bf20"
  
 }
 
-resource "databricks_job" "create_acxiom_views" {  
 
-  token = "dapie73b2f894b4867fef3713a4647b9bf20"
-
-}
 
 resource "databricks_job" "create_multiple_task" {
 
