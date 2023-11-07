@@ -13,17 +13,16 @@ provider "aws" {}
 
 
 provider "databricks" {
-  host  = "https://dbc-a08a98d4-658e.cloud.databricks.com/.cloud.databricks.com"
-
-  token = "dapie8ebcd3fe10b28cc825ae00b54c1f625"
+  host  = "${var.hostname}"
+  token ="${var.token}"
  
 }
 
 
 
-resource "databricks_job" "create_multiple_task" {
+resource "databricks_job" "datascience_features_store_job" {
 
-  name       = "terraform_jobbbbbb"
+  name       = "datascience_features_store_job"
 
   
 
@@ -42,7 +41,7 @@ resource "databricks_job" "create_multiple_task" {
 
 job_cluster {
 
-    job_cluster_key ="j_cluster"
+    job_cluster_key ="datascience_cluster"
 
     new_cluster {
 
@@ -78,9 +77,9 @@ job_cluster {
 
 
 task {
-    task_key = "test_terra_task"
+    task_key = "merch_hierarchy"
     run_if = "ALL_SUCCESS"
-    job_cluster_key ="j_cluster"
+    job_cluster_key ="datascience_cluster"
 
 
     notebook_task {
@@ -90,18 +89,78 @@ task {
   } 
 
 
+} 
+resource "databricks_job" "universe" {
+
+  name       = "universe"
+
+  
+
+  email_notifications {
+    on_start =["spindi@petsmart.com"]
+    on_success =["spindi@petsmart.com"]
+    on_failure =["spindi@petsmart.com"] 
+  }
+ 
+  max_concurrent_runs=1
+  
+
+job_cluster {
+
+    job_cluster_key ="universe_cluster"
+
+    new_cluster {
+
+      autoscale {
+
+        min_workers = 0
+
+        max_workers = 0
+
+      }
+
+      driver_node_type_id = "i3.xlarge"
+
+      node_type_id = "i3.xlarge"
+
+      spark_version = "14.1.x-cpu-ml-scala2.12"
+
+      
+
+ 
+
+      spark_conf = {
+
+                    "spark.databricks.cluster.profile singleNode" = "true"
+                    "spark.sql.hive.metastore.jars" = "maven"
+                    "spark.sql.hive.metastore.version" = "3.1.0"
+                    "spark.hadoop.javax.jdo.option.ConnectionDriverName":"org.mariadb.jdbc.Driver"
+                    "spark.databricks.delta.preview.enabled":"True"
+
+      }
+    }
+  }
+
+
+
   
   task {
-    task_key = "test_terra_task_2"
-     depends_on {
-      task_key = "test_terra_task"
-    }
+    task_key = "universe"
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="universe_cluster"
 
-    job_cluster_key = "j_cluster"
 
     notebook_task {
-       notebook_path = "/Shared/poc_terra"
+      notebook_path = "/Shared/poc_terra"
+    
     }
-  } 
-}  
+  }
+  
+}
+resource "null_resource" "job_2_dependency" {
+  triggers = {
+    job1_id = databricks_job.datascience_features_store_job.id
+  }
+  depends_on = [databricks_job.datascience_features_store_job]
+}   
 
