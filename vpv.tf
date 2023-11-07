@@ -79,7 +79,7 @@ job_cluster {
 task {
     task_key = "RFMT_CLV_model_scoring"
     run_if = "ALL_SUCCESS"
-    job_cluster_key ="datascience_cluster"
+    job_cluster_key ="datascience_scoring"
 
 
     notebook_task {
