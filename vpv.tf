@@ -252,7 +252,7 @@ job_cluster {
     }
   }
   task {
-    task_key = "write_to_snowflake_history"
+    task_key = "write_to_sf_history"
     depends_on {
       task_key = "customer_360_history"
     }
