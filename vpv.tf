@@ -13,16 +13,16 @@ provider "aws" {}
 
 
 provider "databricks" {
-  host  = "${var.hostname}"
-  token ="${var.token}"
+  host  = var.hostname
+  token =  var.token
  
 }
 
 
 
-resource "databricks_job" "datascience_features_store_job" {
+resource "databricks_job" "datascience_rfmt_clr_scoring" {
 
-  name       = "datascience_features_store_job"
+  name       = "datascience_rfmt_clr_scoring"
 
   
 
@@ -41,7 +41,7 @@ resource "databricks_job" "datascience_features_store_job" {
 
 job_cluster {
 
-    job_cluster_key ="datascience_cluster"
+    job_cluster_key ="datascience_scoring"
 
     new_cluster {
 
@@ -77,7 +77,7 @@ job_cluster {
 
 
 task {
-    task_key = "merch_hierarchy"
+    task_key = "RFMT_CLV_model_scoring"
     run_if = "ALL_SUCCESS"
     job_cluster_key ="datascience_cluster"
 
@@ -90,9 +90,9 @@ task {
 
 
 } 
-resource "databricks_job" "universe" {
+resource "databricks_job" "datascience_core_mllib_clv" {
 
-  name       = "universe"
+  name       = "datascience_core_mllib_clv"
 
   
 
@@ -107,7 +107,7 @@ resource "databricks_job" "universe" {
 
 job_cluster {
 
-    job_cluster_key ="universe_cluster"
+    job_cluster_key ="datascience_clv_score_mllib"
 
     new_cluster {
 
@@ -145,9 +145,9 @@ job_cluster {
 
   
   task {
-    task_key = "universe"
+    task_key = "score_clv_mllib"
     run_if = "ALL_SUCCESS"
-    job_cluster_key ="universe_cluster"
+    job_cluster_key ="datascience_clv_score_mllib"
 
 
     notebook_task {
@@ -157,10 +157,114 @@ job_cluster {
   }
   
 }
-resource "null_resource" "job_2_dependency" {
-  triggers = {
-    job1_id = databricks_job.datascience_features_store_job.id
+
+resource "databricks_job" "datascience_customer_360_job" {
+
+  name       = "datascience_customer_360_job"
+
+  
+
+  email_notifications {
+    on_start =["spindi@petsmart.com"]
+    on_success =["spindi@petsmart.com"]
+    on_failure =["spindi@petsmart.com"] 
   }
-  depends_on = [databricks_job.datascience_features_store_job]
-}   
+ 
+  max_concurrent_runs=1
+  
+
+job_cluster {
+
+    job_cluster_key ="datascience_360_job_cluster"
+
+    new_cluster {
+
+      autoscale {
+
+        min_workers = 0
+
+        max_workers = 0
+
+      }
+
+      driver_node_type_id = "i3.xlarge"
+
+      node_type_id = "i3.xlarge"
+
+      spark_version = "14.1.x-cpu-ml-scala2.12"
+
+      
+
+ 
+
+      spark_conf = {
+
+                    "spark.databricks.cluster.profile singleNode" = "true"
+                    "spark.sql.hive.metastore.jars" = "maven"
+                    "spark.sql.hive.metastore.version" = "3.1.0"
+                    "spark.hadoop.javax.jdo.option.ConnectionDriverName":"org.mariadb.jdbc.Driver"
+                    "spark.databricks.delta.preview.enabled":"True"
+
+      }
+    }
+  }
+
+
+
+  
+  task {
+    task_key = "customer_360_current"
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="datascience_360_job_cluster"
+
+
+    notebook_task {
+      notebook_path = "/Shared/poc_terra"
+    
+    }
+  }
+  task {
+    task_key = "customer_360_history"
+    depends_on {
+      task_key = "customer_360_current"
+    }
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="datascience_360_job_cluster"
+
+
+    notebook_task {
+      notebook_path = "/Shared/poc_terra"
+    
+    }
+  }
+  task {
+    task_key = "write_to_snowflake"
+    depends_on {
+      task_key = "customer_360_current"
+    }
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="datascience_360_job_cluster"
+
+
+    notebook_task {
+      notebook_path = "/Shared/poc_terra"
+    
+    }
+  }
+  task {
+    task_key = "write_to_snowflake_history"
+    depends_on {
+      task_key = "customer_360_history"
+    }
+    run_if = "ALL_SUCCESS"
+    job_cluster_key ="datascience_360_job_cluster"
+
+
+    notebook_task {
+      notebook_path = "/Shared/poc_terra"
+    
+    }
+  }
+  
+}
 
